@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 const db = require('../db/connection');
+const apiEndpoints = require('../endpoints.json')
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data');
 
@@ -25,7 +26,9 @@ describe('GET /api/topics', () => {
         });
       });
     });
+});
 
+describe('Errors', () => {
     test('GET: 404 - invalid endpoint', () => {
         return request(app)
           .get('/api/authors')
@@ -35,3 +38,14 @@ describe('GET /api/topics', () => {
           });
       });
 });
+
+describe('GET /api', () => {
+    test('GET: 200 - responds with a JSON object describing all endpoints', async () => {
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.endpoints).toEqual(apiEndpoints);
+        });
+    });
+  });
