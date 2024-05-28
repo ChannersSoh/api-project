@@ -1,6 +1,6 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+To be able to successfully connect to the databases locally, two .env files would need to be created. There would be a .env file for development and for test, which would need to contain PGDATABASE= with the correct database names. To be able to run the databases and tests, node packages specified would need to be installed.
 
 
 
