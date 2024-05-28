@@ -1,12 +1,14 @@
 const express = require("express")
 
-const {getTopics, getEndpoints} = require("./controllers/controllers")
+const {getTopics, getEndpoints, getArticlesById} = require("./controllers/controllers")
 
 const app = express()
 
 app.get('/api/topics', getTopics);
 
 app.get('/api', getEndpoints)
+
+app.get('/api/articles/:article_id', getArticlesById)
 
 
 app.use((req, res, next) => {
@@ -26,7 +28,7 @@ app.use((err, req, res, next) => {
   });
 
   app.use((err, req, res, next) => {
-    res.status(500).send('Server Error!');
+    res.status(500).send('Server Error');
   })
   
 module.exports = app
