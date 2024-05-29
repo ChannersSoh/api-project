@@ -64,7 +64,7 @@ describe('GET /api', () => {
                     created_at: "2020-10-16T05:03:00.000Z",
                     article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
                     article_id: 2,
-                    votes: 0
+                    votes: 0,
           });
       });
     });
@@ -87,3 +87,66 @@ describe('GET /api', () => {
             });
     });
   });
+
+  describe('GET /api/articles', () => {
+    test('GET: 200 - return all articles', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.articles.length).toBe(13);
+            body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(Number),
+          });
+        });
+      });
+    });
+
+    test('GET: 200 - return articles sorted by created at in descending order', () => {
+        return request(app)
+          .get('/api/articles?sort_by=created_at&order=desc')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy('created_at', {
+              descending: true,
+            });
+          });
+      });
+
+      test('GET: 200 - return articles sorted by and ordered by non default imputs', () => {
+        return request(app)
+          .get('/api/articles?sort_by=title&order=asc')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy('title', {
+              ascending: true,
+            });
+          });
+      }); 
+
+    test('GET: 400 - articles sort by invalid column', () => {
+        return request(app)
+          .get('/api/articles?sort_by=story')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Invalid Input');
+          });
+      });
+
+      test('GET: 400 - articles ordered by an invalid input', () => {
+        return request(app)
+            .get('/api/articles?order=left')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Invalid Input');
+            });
+    });
+});
