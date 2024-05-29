@@ -121,7 +121,7 @@ describe('GET /api', () => {
           });
       });
 
-      test('GET: 200 - return articles sorted by and ordered by non default imputs', () => {
+      test('GET: 200 - return articles sorted by and ordered by non default inputs', () => {
         return request(app)
           .get('/api/articles?sort_by=title&order=asc')
           .expect(200)
@@ -199,5 +199,84 @@ describe('GET /api/articles/:article_id/comments', () => {
                 expect(body.comments).toEqual([]);
             });
     });
+});
 
+describe('POST /api/articles/:article_id/comments', () => {
+  test('POST: 201 - successfully post a comment and return the posted comment', () => {
+
+    const newComment = {
+      username: "lurker",
+      body: "Very informative but a little tedious to read",
+    };
+
+      return request(app)
+            .post('/api/articles/2/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body.comment).toMatchObject({
+                author: "lurker",
+                body: "Very informative but a little tedious to read",
+                article_id: 2,
+                comment_id: expect.any(Number),
+                created_at: expect.any(String),
+                votes: expect.any(Number)
+              })
+            })
+  });
+
+  test('POST: 400 - returns Bad Request when required fields are missing', () => {
+    const newComment = {
+        body: "Not So Fantastic"
+    };
+    return request(app)
+        .post('/api/articles/2/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Bad Request: required field missing');
+        });
+  });
+
+  test('POST: 404 - returns User not found when the username does not exist', () => {
+    const newComment = {
+        username: "Channers",
+        body: "Great article"
+    };
+    return request(app)
+        .post('/api/articles/2/comments')
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe('User not found');
+        });
+  });
+
+  test('POST: 404 - returns article does not exist when given an non-existent article id', () => {
+    const newComment = {
+        username: "lurker",
+        body: "Meh!"
+    };
+    return request(app)
+        .post('/api/articles/9999/comments')
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Article does not exist');
+        });
+  });
+
+  test('POST: 400 - returns invalid input for invalid article id', () => {
+    const newComment = {
+        username: "lurker",
+        body: "So-So"
+    };
+    return request(app)
+        .post('/api/articles/invalid/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Invalid Input');
+        });
+  });
 });
