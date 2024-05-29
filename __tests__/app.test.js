@@ -137,7 +137,7 @@ describe('GET /api', () => {
           .get('/api/articles?sort_by=story')
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe('Invalid Input');
+            expect(body.msg).toBe('Invalid Query');
           });
       });
 
@@ -146,7 +146,58 @@ describe('GET /api', () => {
             .get('/api/articles?order=left')
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe('Invalid Input');
+                expect(body.msg).toBe('Invalid Query');
             });
     });
+});
+
+describe('GET /api/articles/:article_id/comments', () => {
+    test('GET: 200 - return all comments from a specific article', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.comments.length).toBe(11);
+            body.comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                    author: expect.any(String),
+                    article_id: expect.any(Number),
+                    comment_id: expect.any(Number),
+                    body: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+          });
+        });
+      });
+    });
+
+    test('GET: 200 - return comments sorted by created at in descending order', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toBeSortedBy('created_at', {
+              descending: true,
+            });
+          });
+      }); 
+
+      test('GET: 404 - return an error when article id does not exist', () => {
+        return request(app)
+            .get('/api/articles/9999/comments')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Article does not exist');
+            });
+    });
+
+    test('GET: 200 - returns an empty array when there are no comments for the article_id', () => {
+        return request(app)
+            .get('/api/articles/2/comments') 
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+    });
+
 });
