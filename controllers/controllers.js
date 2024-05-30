@@ -1,4 +1,4 @@
-const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, checkAuthorExists, updateArticles} = require('../models/models')
+const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, checkAuthorExists, updateArticles, removeComment} = require('../models/models')
 const endpoints = require('../endpoints.json')
 
 exports.getTopics = (req, res, next) => {
@@ -76,6 +76,15 @@ exports.patchArticlesById = (req, res, next) => {
     return updateArticles(article_id, new_votes) 
     .then((article) => {
         res.status(200).send({ article })
+    })
+    .catch(next)
+};
+
+exports.deleteComment = (req, res, next) => {
+    const { comment_id } = req.params
+    return removeComment(comment_id)
+    .then(() => {
+        res.status(204).send()
     })
     .catch(next)
 };
