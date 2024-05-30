@@ -147,7 +147,6 @@ describe('GET /api', () => {
           .expect(200)
           .then(({ body }) => {
             body.articles.forEach((article) => {
-              console.log(article)
               expect(article.topic).toBe('cats')
             });
           });
