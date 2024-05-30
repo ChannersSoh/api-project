@@ -69,6 +69,7 @@ describe('GET /api', () => {
                     article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
                     article_id: 2,
                     votes: 0,
+                    comment_count: 2
           });
       });
     });
@@ -228,7 +229,7 @@ describe('GET /api/articles/:article_id/comments', () => {
     test('GET: 200 - returns an empty array when there are no comments for the article_id', () => {
 
         return request(app)
-            .get('/api/articles/2/comments') 
+            .get('/api/articles/7/comments') 
             .expect(200)
             .then(({ body }) => {
                 expect(body.comments).toEqual([]);
