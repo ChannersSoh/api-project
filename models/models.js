@@ -31,7 +31,7 @@ exports.selectArticlesById = (id) => {
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then((result) => {
         if (result.rows.length === 0) {
-            return Promise.reject({ status: 404, msg: 'Article does not exist' });
+            return Promise.reject({ status: 404, msg: 'Article does not exist' })
         }
         return result.rows[0];
     });
@@ -67,8 +67,22 @@ exports.insertComment = (newComment) => {
 };
 
 exports.checkAuthorExists = (username) => {
-    return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+    return db.query(`SELECT * FROM users 
+                     WHERE username = $1`, [username])
         .then(({ rows }) => {
                 return rows.length > 0
         });
-    }
+    };
+
+exports.updateArticles = (article_id, new_votes) => {
+  return db.query(`UPDATE articles 
+                   SET votes = votes + $1
+                   WHERE article_id = $2
+                   Returning *`, [new_votes, article_id])
+        .then(({rows}) => {
+            if(rows.length === 0) {
+                return Promise.reject({ status: 404, msg: 'Article does not exist' })
+            }
+            return rows[0]
+        });
+};

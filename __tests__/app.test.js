@@ -13,6 +13,7 @@ afterAll(() => db.end());
 
 describe('GET /api/topics', () => {
     test('GET: 200 - return all topics', () => {
+
       return request(app)
         .get('/api/topics')
         .expect(200)
@@ -30,6 +31,7 @@ describe('GET /api/topics', () => {
 
 describe('Errors', () => {
     test('GET: 404 - invalid endpoint', () => {
+
         return request(app)
           .get('/api/authors')
           .expect(404)
@@ -41,6 +43,7 @@ describe('Errors', () => {
 
 describe('GET /api', () => {
     test('GET: 200 - returns a JSON object describing all endpoints', () => {
+
         return request(app)
             .get('/api')
             .expect(200)
@@ -52,6 +55,7 @@ describe('GET /api', () => {
 
   describe('GET /api/articles/:article_id', () => {
     test('GET: 200 - returns an article object', () => {
+
         return request(app)
         .get('/api/articles/2')
         .expect(200)
@@ -70,6 +74,7 @@ describe('GET /api', () => {
     });
 
     test('GET: 404 - returns "Not Found" for non-existent article_id', () => {
+
         return request(app)
             .get('/api/articles/9999')
             .expect(404)
@@ -79,6 +84,7 @@ describe('GET /api', () => {
     });
 
     test('GET: 400 - returns "Bad Request" for an invalid parameter', () => {
+
         return request(app)
             .get('/api/articles/one')
             .expect(400)
@@ -90,6 +96,7 @@ describe('GET /api', () => {
 
   describe('GET /api/articles', () => {
     test('GET: 200 - return all articles', () => {
+
       return request(app)
         .get('/api/articles')
         .expect(200)
@@ -111,6 +118,7 @@ describe('GET /api', () => {
     });
 
     test('GET: 200 - return articles sorted by created at in descending order', () => {
+
         return request(app)
           .get('/api/articles?sort_by=created_at&order=desc')
           .expect(200)
@@ -122,6 +130,7 @@ describe('GET /api', () => {
       });
 
       test('GET: 200 - return articles sorted by and ordered by non default inputs', () => {
+
         return request(app)
           .get('/api/articles?sort_by=title&order=asc')
           .expect(200)
@@ -133,6 +142,7 @@ describe('GET /api', () => {
       }); 
 
     test('GET: 400 - articles sort by invalid column', () => {
+
         return request(app)
           .get('/api/articles?sort_by=story')
           .expect(400)
@@ -142,6 +152,7 @@ describe('GET /api', () => {
       });
 
       test('GET: 400 - articles ordered by an invalid input', () => {
+
         return request(app)
             .get('/api/articles?order=left')
             .expect(400)
@@ -153,6 +164,7 @@ describe('GET /api', () => {
 
 describe('GET /api/articles/:article_id/comments', () => {
     test('GET: 200 - return all comments from a specific article', () => {
+
       return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
@@ -172,6 +184,7 @@ describe('GET /api/articles/:article_id/comments', () => {
     });
 
     test('GET: 200 - return comments sorted by created at in descending order', () => {
+
         return request(app)
           .get('/api/articles/1/comments')
           .expect(200)
@@ -183,6 +196,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       }); 
 
       test('GET: 404 - return an error when article id does not exist', () => {
+
         return request(app)
             .get('/api/articles/9999/comments')
             .expect(404)
@@ -192,6 +206,7 @@ describe('GET /api/articles/:article_id/comments', () => {
     });
 
     test('GET: 200 - returns an empty array when there are no comments for the article_id', () => {
+
         return request(app)
             .get('/api/articles/2/comments') 
             .expect(200)
@@ -226,6 +241,7 @@ describe('POST /api/articles/:article_id/comments', () => {
   });
 
   test('POST: 400 - returns Bad Request when required fields are missing', () => {
+
     const newComment = {
         body: "Not So Fantastic"
     };
@@ -253,6 +269,7 @@ describe('POST /api/articles/:article_id/comments', () => {
   });
 
   test('POST: 404 - returns article does not exist when given an non-existent article id', () => {
+
     const newComment = {
         username: "lurker",
         body: "Meh!"
@@ -267,6 +284,7 @@ describe('POST /api/articles/:article_id/comments', () => {
   });
 
   test('POST: 400 - returns invalid input for invalid article id', () => {
+
     const newComment = {
         username: "lurker",
         body: "So-So"
@@ -278,5 +296,60 @@ describe('POST /api/articles/:article_id/comments', () => {
         .then(({ body }) => {
             expect(body.msg).toBe('Invalid Input');
         });
+  });
+});
+
+describe('PATCH /api/articles/:article_id', () => {
+      test('PATCH: 200 - returns article with the updated votes', () => {
+    
+        const newVotes = {
+          new_votes: 5
+        }
+
+        return request(app)
+            .patch('/api/articles/2')
+            .send(newVotes)
+            .expect(200)
+            .then(({body}) => {
+              expect(body.article).toMatchObject({
+                author: "icellusedkars",
+                title: "Sony Vaio; or, The Laptop",
+                article_id: 2,
+                topic: "mitch",
+                created_at: expect.any(String),
+                votes: 5,
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          })
+        })
+      });
+    
+      test('PATCH: 400 - returns an error when new votes is not a number', () => {
+
+        const newVotes = { 
+          new_votes: 'author'
+        }
+
+        return request(app)
+            .patch('/api/articles/2')
+            .send(newVotes)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request: votes must be a number');
+            });
+    });
+
+      test('PATCH: 404 - responds with an error when article_id does not exist', () => {
+
+        const newVotes = {
+          new_votes: 5
+        }
+
+        return request(app)
+            .patch('/api/articles/9999')
+            .send(newVotes)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Article does not exist');
+          });
   });
 });
