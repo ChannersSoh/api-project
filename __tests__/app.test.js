@@ -214,6 +214,16 @@ describe('GET /api/articles/:article_id/comments', () => {
                 expect(body.comments).toEqual([]);
             });
     });
+
+    test('POST: 400 - returns invalid input for invalid article id', () => {
+
+      return request(app)
+          .get('/api/articles/invalid/comments')
+          .expect(400)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Invalid Input');
+          });
+    });
 });
 
 describe('POST /api/articles/:article_id/comments', () => {
@@ -352,4 +362,22 @@ describe('PATCH /api/articles/:article_id', () => {
                 expect(body.msg).toBe('Article does not exist');
           });
   });
+});
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('DELETE: 204 - delete a comment and return nothing', () => {
+
+    return request(app)
+        .delete('/api/comments/5')
+        .expect(204)  
+  });
+  
+  test('DELETE: 400 - returns an error when comment id is invalid', () => {
+    return request(app)
+        .delete('/api/comments/author')
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Invalid Input');
+        });
+});
 });
