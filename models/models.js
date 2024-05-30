@@ -54,6 +54,14 @@ exports.selectCommentsByArticleId = (id) => {
         });
 };
 
+exports.selectUsers = () => {
+    return db.query(`SELECT username, name, avatar_url 
+                     FROM users`)
+    .then(({rows}) => {
+        return rows
+    })
+}
+
 exports.insertComment = (newComment) => {
     const { author, body, article_id} = newComment
     return db.query(`INSERT INTO comments
