@@ -47,7 +47,7 @@ module.exports = [
   },
   {
     title: "A",
-    topic: "mitch",
+    topic: "cats",
     author: "icellusedkars",
     body: "Delicious tin of cat food",
     created_at: 1602986400000,

@@ -141,6 +141,26 @@ describe('GET /api', () => {
           });
       }); 
 
+      test('GET: 200 - returns articles filtered by topic', () => {
+        return request(app)
+          .get('/api/articles?topic=cats')
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe('cats')
+            });
+          });
+      });
+
+      test('GET: 200 -returns an empty array when the topic does not exist', () => {
+        return request(app)
+          .get('/api/articles?topic=nothing')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toEqual([]);
+          });
+      });
+
     test('GET: 400 - articles sort by invalid column', () => {
 
         return request(app)
@@ -332,7 +352,31 @@ describe('PATCH /api/articles/:article_id', () => {
       test('PATCH: 200 - returns article with the updated votes', () => {
     
         const newVotes = {
-          new_votes: 5
+          inc_votes: 5
+        }
+
+        return request(app)
+            .patch('/api/articles/2')
+            .send(newVotes)
+            .expect(200)
+            .then(({body}) => {
+              expect(body.article).toMatchObject({
+                author: "icellusedkars",
+                title: "Sony Vaio; or, The Laptop",
+                article_id: 2,
+                topic: "mitch",
+                created_at: expect.any(String),
+                votes: 5,
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          })
+        })
+      });
+
+      test('PATCH: 200 - returns article with the updated votes even with unwanted object properties', () => {
+    
+        const newVotes = {
+          inc_votes: 5,
+          comment: "Fantastic"
         }
 
         return request(app)
@@ -355,7 +399,7 @@ describe('PATCH /api/articles/:article_id', () => {
       test('PATCH: 400 - returns an error when new votes is not a number', () => {
 
         const newVotes = { 
-          new_votes: 'author'
+          inc_votes: 'author'
         }
 
         return request(app)
@@ -363,14 +407,42 @@ describe('PATCH /api/articles/:article_id', () => {
             .send(newVotes)
             .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe('Bad Request: votes must be a number');
+                expect(body.msg).toBe('Invalid Input');
             });
     });
+
+    test('PATCH: 400 - returns an error when passed nothing into inc votes', () => {
+
+      const newVotes = {}
+
+      return request(app)
+          .patch('/api/articles/2')
+          .send(newVotes)
+          .expect(400)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Invalid Input');
+          });
+  });
+
+  test('PATCH: 400 - responds with an error when article id is not a valid value', () => {
+
+    const newVotes = {
+      inc_votes: 5
+    }
+
+    return request(app)
+        .patch('/api/articles/author')
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Invalid Input');
+      });
+});
 
       test('PATCH: 404 - responds with an error when article_id does not exist', () => {
 
         const newVotes = {
-          new_votes: 5
+          inc_votes: 5
         }
 
         return request(app)
@@ -398,5 +470,14 @@ describe('DELETE /api/comments/:comment_id', () => {
         .then(({ body }) => {
             expect(body.msg).toBe('Invalid Input');
         });
+});
+
+test('DELETE: 404 - returns an error when comment id does not exist', () => {
+  return request(app)
+      .delete('/api/comments/9999')
+      .expect(404)
+      .then(({ body }) => {
+          expect(body.msg).toBe('Comment does not exist');
+      });
 });
 });

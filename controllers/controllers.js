@@ -13,9 +13,9 @@ exports.getEndpoints = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const { sort_by, order } = req.query;
+    const { sort_by, order, topic } = req.query;
 
-    selectArticles(sort_by, order).then((articles) => {
+    selectArticles(sort_by, order, topic).then((articles) => {
         res.status(200).send({articles})
     })
     .catch(next)
@@ -74,13 +74,9 @@ exports.postCommentToAnArticle = (req, res, next) => {
 
 exports.patchArticlesById = (req, res, next) => {
     const { article_id } = req.params
-    const { new_votes } = req.body
+    const { inc_votes } = req.body
 
-    if (typeof new_votes !== 'number') {
-        return res.status(400).send({ msg: 'Bad Request: votes must be a number' });
-    }
-
-    return updateArticles(article_id, new_votes) 
+    return updateArticles(article_id, inc_votes) 
     .then((article) => {
         res.status(200).send({ article })
     })
@@ -89,6 +85,7 @@ exports.patchArticlesById = (req, res, next) => {
 
 exports.deleteComment = (req, res, next) => {
     const { comment_id } = req.params
+
     return removeComment(comment_id)
     .then(() => {
         res.status(204).send()
