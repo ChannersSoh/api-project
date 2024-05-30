@@ -1,4 +1,4 @@
-const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, checkAuthorExists} = require('../models/models')
+const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, checkAuthorExists, updateArticles} = require('../models/models')
 const endpoints = require('../endpoints.json')
 
 exports.getTopics = (req, res, next) => {
@@ -63,4 +63,19 @@ exports.postCommentToAnArticle = (req, res, next) => {
         res.status(201).send({ comment });
     })
     .catch(next);
-}
+};
+
+exports.patchArticlesById = (req, res, next) => {
+    const { article_id } = req.params
+    const { new_votes } = req.body
+
+    if (typeof new_votes !== 'number') {
+        return res.status(400).send({ msg: 'Bad Request: votes must be a number' });
+    }
+
+    return updateArticles(article_id, new_votes) 
+    .then((article) => {
+        res.status(200).send({ article })
+    })
+    .catch(next)
+};
