@@ -304,7 +304,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         });
   });
 
-  test('POST: 404 - returns User not found when the username does not exist', () => {
+  test('POST: 404 - returns Invalid Input when the username does not exist', () => {
     const newComment = {
         username: "Channers",
         body: "Great article"
@@ -314,7 +314,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         .send(newComment)
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe('User not found');
+            expect(body.msg).toBe('User does not exist');
         });
   });
 

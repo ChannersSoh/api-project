@@ -84,14 +84,6 @@ exports.insertComment = (newComment) => {
     })
 };
 
-exports.checkAuthorExists = (username) => {
-    return db.query(`SELECT * FROM users 
-                     WHERE username = $1`, [username])
-        .then(({ rows }) => {
-                return rows.length > 0
-        });
-    };
-
 exports.updateArticles = (article_id, inc_votes) => {
     if(!inc_votes){
         return Promise.reject({ status: 400, msg: 'Invalid Input' })

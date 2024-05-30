@@ -1,4 +1,4 @@
-const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, checkAuthorExists, updateArticles, removeComment, selectUsers} = require('../models/models')
+const {selectTopics, selectArticlesById, selectArticles, selectCommentsByArticleId, insertComment, updateArticles, removeComment, selectUsers} = require('../models/models')
 const endpoints = require('../endpoints.json')
 
 exports.getTopics = (req, res, next) => {
@@ -55,15 +55,8 @@ exports.postCommentToAnArticle = (req, res, next) => {
         return res.status(400).send({ status: 400, msg: "Bad Request: required field missing"})
     }
 
-    Promise.all([selectArticlesById(article_id), checkAuthorExists(username)])
-    .then(([article, userExists]) => {
-        if (!article) {
-            return Promise.reject({ status: 404, msg: 'Article does not exist' });
-        }
-        if (!userExists) {
-            return Promise.reject({ status: 404, msg: 'User not found' });
-        }
-        const newComment = { author: username, body, article_id };
+    return selectArticlesById(article_id)
+    .then(() => {
         return insertComment(newComment);
     })
     .then((comment) => {
