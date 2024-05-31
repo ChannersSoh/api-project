@@ -41,5 +41,31 @@
         "article_img_url": "image_url"
       }
     }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "Gets all comments by the article ID",
+    "queries": [],
+    "exampleResponse": {
+      "comments": {
+        "body": "The owls are not what they seem.",
+        "votes": 20,
+        "author": "icellusedkars",
+        "article_id": 9,
+        "created_at": 1584205320000,
+        "comment_id": 11
+      }
+    }
+  },
+  "GET /api/users": {
+    "description": "Gets all users",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+       " username": "grumpy19",
+        "name": "Paul Grump",
+        "avatar_url":
+          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+      }
+    }
   }
 }

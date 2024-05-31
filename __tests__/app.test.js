@@ -153,14 +153,24 @@ describe('GET /api', () => {
           });
       });
 
-      test('GET: 200 -returns an empty array when the topic does not exist', () => {
+      test('GET: 200 - returns an empty array when the topic does exist but had no comments', () => {
         return request(app)
-          .get('/api/articles?topic=nothing')
+          .get('/api/articles?topic=paper')
           .expect(200)
           .then(({ body }) => {
             expect(body.articles).toEqual([]);
           });
       });
+
+      test('GET: 404 - returns an error when topic does not exist', () => {
+        return request(app)
+          .get('/api/articles?topic=banana')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Topic does not exist");
+          });
+      });
+
 
     test('GET: 400 - articles sort by invalid column', () => {
 
@@ -421,7 +431,7 @@ describe('PATCH /api/articles/:article_id', () => {
           .send(newVotes)
           .expect(400)
           .then(({ body }) => {
-              expect(body.msg).toBe('Invalid Input');
+              expect(body.msg).toBe('Required key missing');
           });
   });
 

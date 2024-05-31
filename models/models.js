@@ -29,7 +29,17 @@ exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
         sqlQuery += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
         return db.query(sqlQuery, queryParams).then(({rows}) => {
-            return rows
+            if(topic && rows.length === 0) {
+                return db.query(`SELECT * FROM topics
+                                 WHERE slug = $1`, [topic])
+                .then(({rows: topicRows}) => {
+                    if(topicRows.length === 0) {
+                        return Promise.reject({ status: 404, msg: 'Topic does not exist' })
+                    }
+                    return []
+                });
+            }
+            return rows;
         });
 };
 
@@ -86,7 +96,7 @@ exports.insertComment = (newComment) => {
 
 exports.updateArticles = (article_id, inc_votes) => {
     if(!inc_votes){
-        return Promise.reject({ status: 400, msg: 'Invalid Input' })
+        return Promise.reject({ status: 400, msg: 'Required key missing' })
     }
 
   return db.query(`UPDATE articles 
