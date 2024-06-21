@@ -5,7 +5,7 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
-    const validSortBy = ["created_at", "title", "author", "topic", "votes"];
+    const validSortBy = ["created_at", "title", "author", "topic", "votes", "comment_count"];
     const validOrder = ["ASC", "asc", "DESC", "desc"];
 
     if ((sort_by && !validSortBy.includes(sort_by)) ||
